@@ -2,10 +2,7 @@ package cn.itcast.client;
 
 import cn.itcast.protocol.MessageCodecSharable;
 import cn.itcast.protocol.ProcotolFrameDecoder;
-import cn.itcast.server.handler.ChatResponseHandler;
-import cn.itcast.server.handler.GroupChatResponseHandler;
-import cn.itcast.server.handler.GroupCreateResponseHandler;
-import cn.itcast.server.handler.loginRequestHandler;
+import cn.itcast.server.handler.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -47,6 +44,12 @@ public class ChatClient {
                     ch.pipeline().addLast(new GroupCreateResponseHandler());
                     //入站，处理群聊消息
                     ch.pipeline().addLast(new GroupChatResponseHandler());
+                    //入站，退群的响应消息
+                    ch.pipeline().addLast(new GroupQuitResponseHandler());
+                    //入站，处理入群的响应消息
+                    ch.pipeline().addLast(new GroupJoinResponseHandler());
+                    //入站，查看群成员的响应信息
+                    ch.pipeline().addLast(new GroupMembersResponseHandler());
                 }
             });
             Channel channel = bootstrap.connect("localhost", 8080).sync().channel();

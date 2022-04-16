@@ -79,11 +79,11 @@ public class loginRequestHandler extends SimpleChannelInboundHandler<LoginRespon
                 System.out.println("send [username] [content]");
                 System.out.println("gsend [group name] [content]");
                 System.out.println("gcreate [group name] [m1,m2,m3...]");
-                System.out.println("gmembers [group name]");
+                System.out.println("gmembers [groupname]");
                 System.out.println("gjoin [group name]");
                 System.out.println("gquit [group name]");
                 System.out.println("quit");
-                System.out.println("=============================================================");
+                System.out.println("==============================================================");
 
                 String command = scan.nextLine();
                 String[] strs = command.split(" ");
@@ -101,7 +101,7 @@ public class loginRequestHandler extends SimpleChannelInboundHandler<LoginRespon
                         ctx.writeAndFlush(new GroupCreateRequestMessage(strs[1], members));
                         break;
                     case "gmembers": //拉人进群
-                        ctx.writeAndFlush(new GroupJoinRequestMessage(strs[1], strs[2]));
+                        ctx.writeAndFlush(new GroupMembersRequestMessage(strs[1]));
                         break;
                     case "gjoin":  //加入聊天室
                         ctx.writeAndFlush(new GroupJoinRequestMessage(name, strs[1]));

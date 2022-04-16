@@ -10,9 +10,11 @@ import java.util.Set;
 public class GroupMembersResponseMessage extends Message {
 
     private Set<String> members;
+    private String groupname;
 
-    public GroupMembersResponseMessage(Set<String> members) {
+    public GroupMembersResponseMessage(Set<String> members, String groupname) {
         this.members = members;
+        this.groupname = groupname;
     }
 
     @Override

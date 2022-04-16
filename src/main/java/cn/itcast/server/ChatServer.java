@@ -1,11 +1,10 @@
 package cn.itcast.server;
 
+import cn.itcast.message.QuitRequestMessage;
 import cn.itcast.protocol.MessageCodecSharable;
 import cn.itcast.protocol.ProcotolFrameDecoder;
-import cn.itcast.server.handler.ChatRequestHandler;
-import cn.itcast.server.handler.GroupChatRequestHandler;
-import cn.itcast.server.handler.GroupCreateRequestHandler;
-import cn.itcast.server.handler.loginResponseHandler;
+import cn.itcast.server.handler.*;
+import cn.itcast.server.session.SessionFactory;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -42,6 +41,26 @@ public class ChatServer {
                     ch.pipeline().addLast(new GroupCreateRequestHandler());
                     //入站，处理群发消息请求
                     ch.pipeline().addLast(new GroupChatRequestHandler());
+                    //入站，处理加群消息
+                    ch.pipeline().addLast(new GroupJoinRequestHandler());
+                    //入站，处理退群消息
+                    ch.pipeline().addLast(new GroupQuitRequestHandler());
+                    //入站，处理查看群聊成员请求
+                    ch.pipeline().addLast(new GroupMembersRequestHandler());
+                    ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+                        @Override
+                        public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+                            SessionFactory.getSession().unbind(ctx.channel());
+//                            ctx.channel().close();
+                            log.debug("{} 已经断开", ctx.channel());
+                        }
+
+                        @Override
+                        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+                            SessionFactory.getSession().unbind(ctx.channel());
+                            log.debug("{} 已经异常断开 异常是{}", ctx.channel(), cause.getMessage());
+                        }
+                    });
                 }
             });
             Channel channel = serverBootstrap.bind(8080).sync().channel();
